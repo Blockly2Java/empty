@@ -7,3 +7,6 @@
 [submodule "tests"]
 	path = tests
 	url = git@github.com:Blockly2Java/Smiley_tests.git
+[submodule "aux"]
+	path = aux
+	url = ./aux

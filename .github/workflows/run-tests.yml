@@ -27,6 +27,13 @@ jobs:
         with:
           submodules: false
 
+      - name: Rewrite submodule URLs to HTTPS
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config --global --add url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf git@github.com:
+          git config --global --add url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf ssh://git@github.com/
+
       - name: Initialize required submodules
         run: |
           git submodule sync -- solution template tests

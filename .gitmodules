@@ -1,12 +1,9 @@
 [submodule "solution"]
 	path = solution
-	url = git@github.com:Blockly2Java/Smiley_solution.git
+	url = git@github.com:Blockly2Java/Taschenrechner_solution.git
 [submodule "template"]
 	path = template
-	url = git@github.com:Blockly2Java/Smiley_template.git
+	url = git@github.com:Blockly2Java/Taschenrechner_template.git
 [submodule "tests"]
 	path = tests
-	url = git@github.com:Blockly2Java/Smiley_tests.git
-[submodule "aux"]
-	path = aux
-	url = ./aux
+	url = git@github.com:Blockly2Java/Taschenrechner_tests.git

@@ -12,19 +12,18 @@ Legend: ✅ passed, ❌ failed/error, ⏭️ skipped, — not present.
 
 | Test Case | Solution | Template |
 | --- | --- | --- |
-| test.TestManager. | — | ❌ |
-| test.TestManager.strukturTests(String)[1] | ✅ | — |
-| test.TestManager.strukturTests(String)[2] | ✅ | — |
-| test.TestManager.strukturTests(String)[3] | ✅ | — |
-| test.TestManager.strukturTests(String)[4] | ✅ | — |
-| test.TestManager.strukturTests(String)[5] | ✅ | — |
-| test.TestManager.strukturTests(String)[6] | ✅ | — |
-| test.TestManager.strukturTests(String)[7] | ✅ | — |
-| test.TestManager.strukturTests(String)[8] | ✅ | — |
-| test.TestManager.testBewegen | ❌ | — |
-| test.TestManager.testRandErreicht | ❌ | — |
-| test.TestManager.testRumfliegen | ❌ | — |
-| test.TestManager.testSmileyCtr_Layout | ✅ | — |
-| test.TestManager.testSmileyCtr_Objects | ✅ | — |
-| test.TestManager.testSmileyCtr_Speed | ✅ | — |
+| test.TestManager.strukturTests(String)[1] | ✅ | ❌ |
+| test.TestManager.strukturTests(String)[2] | ✅ | ❌ |
+| test.TestManager.strukturTests(String)[3] | ✅ | ❌ |
+| test.TestManager.strukturTests(String)[4] | ✅ | ❌ |
+| test.TestManager.strukturTests(String)[5] | ✅ | ❌ |
+| test.TestManager.strukturTests(String)[6] | ✅ | ❌ |
+| test.TestManager.strukturTests(String)[7] | ✅ | ❌ |
+| test.TestManager.strukturTests(String)[8] | ✅ | ❌ |
+| test.TestManager.testBewegen | ❌ | ❌ |
+| test.TestManager.testRandErreicht | ❌ | ❌ |
+| test.TestManager.testRumfliegen | ❌ | ❌ |
+| test.TestManager.testSmileyCtr_Layout | ✅ | ❌ |
+| test.TestManager.testSmileyCtr_Objects | ✅ | ❌ |
+| test.TestManager.testSmileyCtr_Speed | ✅ | ❌ |
 <!-- TEST_OVERVIEW_END -->

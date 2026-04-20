@@ -1,0 +1,61 @@
+name: Template Tests
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  test-template:
+    name: Test template
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Rewrite submodule URLs to HTTPS
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config --global --add url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf git@github.com:
+          git config --global --add url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf ssh://git@github.com/
+
+      - name: Initialize required submodules
+        run: |
+          git submodule sync -- solution template tests
+          git -c protocol.version=2 submodule update --init --force --depth=1 solution template tests
+
+      - name: Fetch aux sources
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ ! -d aux/.git ]; then
+            git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/Blockly2Java/Smiley_aux.git" aux
+          fi
+
+      - name: Stage aux classes for template build
+        run: |
+          mkdir -p template/src
+          find aux -maxdepth 1 -name '*.java' -exec cp -f {} template/src/ \;
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Run template tests
+        run: mvn -B -f tests/pom_template.xml -Dmaven.test.failure.ignore=true clean test
+
+      - name: Upload Surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports-template
+          path: tests/target/surefire-reports
+          if-no-files-found: ignore

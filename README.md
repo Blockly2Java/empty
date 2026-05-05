@@ -3,7 +3,7 @@
 ## Abstract
 
 <!-- START Adjust for exercise -->
-This exercise asks students to implement a basic calculator class in Java with methods for addition, subtraction, multiplication, division, exponentiation, and average calculation. It reinforces core concepts such as method design, numeric data types, return values, parameter handling, and writing robust logic for arithmetic operations (including edge-case thinking such as division behavior). Difficulty level: easy to medium, suitable for beginners who already know Java syntax and are starting to structure small, test-driven classes.
+TODO: Insert a short abstract about the exercise to help teachers choose. Explicitly mention the applied concepts and the diffcult level for students.
 <!-- END Adjust for exercise -->
 
 Detailed exercise instructions can be found in the README file of the template repository.

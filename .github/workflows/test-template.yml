@@ -16,6 +16,9 @@ jobs:
           echo "tests=${GITHUB_REPOSITORY_OWNER}/${EXERCISE}_tests" >> $GITHUB_OUTPUT
           echo "template=${GITHUB_REPOSITORY_OWNER}/${EXERCISE}_template" >> $GITHUB_OUTPUT
 
+      - name: Checkout coordinator
+        uses: actions/checkout@v4
+
       - name: Checkout tests
         uses: actions/checkout@v4
         with:
@@ -35,11 +38,13 @@ jobs:
         with:
           distribution: temurin
           java-version: '25'
-          cache: maven
-          cache-dependency-path: tests/pom.xml
+          cache: gradle
+
+      - name: Make Maven wrapper executable
+        run: chmod +x tests/mvnw
 
       - name: Run template tests
-        run: cd tests && ./mvnw -B clean test -Ptemplate -Dmaven.test.failure.ignore=true
+        run: ./gradlew testTemplate
 
       - name: Upload Surefire reports
         if: always()

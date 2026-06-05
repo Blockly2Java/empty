@@ -40,16 +40,16 @@ jobs:
           java-version: '25'
           cache: gradle
 
-      - name: Make Maven wrapper executable
-        run: chmod +x tests/mvnw
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Run template tests
-        run: ./gradlew testTemplate
+        run: gradle testTemplate
 
-      - name: Upload Surefire reports
+      - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: surefire-reports-template
-          path: tests/target/surefire-reports
+          name: test-reports-template
+          path: build/reports/tests/testTemplate
           if-no-files-found: ignore

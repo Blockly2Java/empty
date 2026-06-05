@@ -10,8 +10,6 @@ jobs:
     steps:
       - name: Checkout coordinator
         uses: actions/checkout@v4
-        with:
-          path: coordinator
 
       - name: Derive sub-repo names
         id: repos
@@ -27,21 +25,21 @@ jobs:
         with:
           repository: ${{ steps.repos.outputs.tests }}
           token: ${{ github.token }}
-          path: coordinator/tests
+          path: tests
 
       - name: Checkout solution
         uses: actions/checkout@v4
         with:
           repository: ${{ steps.repos.outputs.solution }}
           token: ${{ github.token }}
-          path: coordinator/solution
+          path: solution
 
       - name: Checkout template
         uses: actions/checkout@v4
         with:
           repository: ${{ steps.repos.outputs.template }}
           token: ${{ github.token }}
-          path: coordinator/template
+          path: template
 
       - name: Set up JDK 25
         uses: actions/setup-java@v4
@@ -50,45 +48,44 @@ jobs:
           java-version: '25'
           cache: gradle
 
-      - name: Make Maven wrapper executable
-        run: chmod +x coordinator/tests/mvnw
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Run solution tests for overview
         continue-on-error: true
-        run: cd coordinator && ./gradlew testSolution
+        run: gradle testSolution
 
       - name: Save solution reports
         if: always()
         run: |
-          mkdir -p coordinator/.ci-reports/solution
-          if [ -d coordinator/tests/target/surefire-reports ]; then
-            cp -r coordinator/tests/target/surefire-reports/. coordinator/.ci-reports/solution/
+          mkdir -p .ci-reports/solution
+          if [ -d build/reports/tests/testSolution ]; then
+            cp -r build/reports/tests/testSolution/. .ci-reports/solution/
           fi
 
       - name: Run template tests for overview
         continue-on-error: true
-        run: cd coordinator && ./gradlew testTemplate
+        run: gradle testTemplate
 
       - name: Save template reports
         if: always()
         run: |
-          mkdir -p coordinator/.ci-reports/template
-          if [ -d coordinator/tests/target/surefire-reports ]; then
-            cp -r coordinator/tests/target/surefire-reports/. coordinator/.ci-reports/template/
+          mkdir -p .ci-reports/template
+          if [ -d build/reports/tests/testTemplate ]; then
+            cp -r build/reports/tests/testTemplate/. .ci-reports/template/
           fi
 
       - name: Update README overview section
         if: always()
         run: |
-          python3 coordinator/.github/scripts/update_readme_test_overview.py \
-            coordinator/README.md \
-            coordinator/.ci-reports/solution \
-            coordinator/.ci-reports/template
+          python3 .github/scripts/update_readme_test_overview.py \
+            README.md \
+            .ci-reports/solution \
+            .ci-reports/template
 
       - name: Commit updated README
         if: always()
         run: |
-          cd coordinator
           if git diff --quiet -- README.md; then
             echo "README overview is unchanged."
             exit 0

@@ -1,34 +1,76 @@
 // build.gradle — top-level coordinator.
-// Delegates test execution to Maven in the tests/ subdirectory.
+// Runs the test suite directly with Gradle (no Maven involved).
 // No exercise-specific content; works in any fork unchanged.
 //
 // Usage:
-//   ./gradlew testSolution   → tests against solution/ (must be green)
-//   ./gradlew testTemplate   → tests against template/ (failures expected)
-//   ./gradlew clean test     → clean + testSolution
+//   gradle testSolution   → tests against solution/src (must be green)
+//   gradle testTemplate   → tests against template/src (failures expected)
+//   gradle test           → alias for testSolution
 
-task testSolution(type: Exec) {
-    group = 'verification'
-    description = 'Runs the test suite against the solution (Maven -Psolution)'
-    workingDir = file('tests')
-    commandLine './mvnw', '-B', 'clean', 'test', '-Psolution'
+plugins {
+    id 'java'
 }
 
-task testTemplate(type: Exec) {
-    group = 'verification'
-    description = 'Runs the test suite against the template (Maven -Ptemplate)'
-    workingDir = file('tests')
-    commandLine './mvnw', '-B', 'clean', 'test', '-Ptemplate', '-Dmaven.test.failure.ignore=true'
+repositories {
+    mavenCentral()
 }
 
-task test(dependsOn: testSolution) {
-    group = 'verification'
-    description = 'Alias for testSolution'
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly    'org.junit.platform:junit-platform-launcher:1.10.2'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+    testImplementation 'de.tum.cit.aet:levenshtein-name-deviation-pattern:+'
 }
 
-task clean(type: Exec) {
-    group = 'build'
-    description = 'Cleans Maven build output in tests/'
-    workingDir = file('tests')
-    commandLine './mvnw', '-B', 'clean'
+// Shared test configuration
+test {
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath        = sourceSets.test.runtimeClasspath
+}
+
+// ── testSolution ──────────────────────────────────────────────────────────────
+// Compiles solution/src as main sources, then runs the test suite.
+// Expected result: all tests GREEN.
+sourceSets {
+    testSolution {
+        java.srcDirs = [file('solution/src'), file('tests/test')]
+    }
+    testTemplate {
+        java.srcDirs = [file('template/src'), file('tests/test')]
+    }
+}
+
+configurations {
+    testSolutionImplementation.extendsFrom testImplementation
+    testSolutionRuntimeOnly.extendsFrom   testRuntimeOnly
+    testTemplateImplementation.extendsFrom testImplementation
+    testTemplateRuntimeOnly.extendsFrom   testRuntimeOnly
+}
+
+task testSolution(type: Test) {
+    group       = 'verification'
+    description = 'Runs the test suite against solution/src (must be green)'
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.testSolution.output.classesDirs
+    classpath       = sourceSets.testSolution.runtimeClasspath
+}
+
+task testTemplate(type: Test) {
+    group       = 'verification'
+    description = 'Runs the test suite against template/src (failures expected)'
+    useJUnitPlatform()
+    ignoreFailures = true
+    testClassesDirs = sourceSets.testTemplate.output.classesDirs
+    classpath       = sourceSets.testTemplate.runtimeClasspath
+}
+
+// Default 'test' task → testSolution
+test.dependsOn testSolution
+test.enabled = false   // disable the default test task; use testSolution directly
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }

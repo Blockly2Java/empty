@@ -26,4 +26,4 @@ for sub in solution template tests; do
   fi
 done
 echo ""
-echo "Done! Run './gradlew testSolution' to verify."
+echo "Done! Run 'gradle testSolution' to verify."

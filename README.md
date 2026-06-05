@@ -13,14 +13,13 @@ Detailed exercise instructions can be found in the README file of the template r
 
 Auto-updated by CI from latest test runs.
 <!-- markdownlint-disable-next-line MD033 -->
-> <sub>Last Updated: 5. May 2026 02:48:45 [CEST]</sub>
+> <sub>Last Updated: 5. Jun 2026 21:03:49 [CEST]</sub>
 <!-- markdownlint-disable-next-line MD033 -->
-> <sub>Commit: a2ed91b585967660b56807bebb0da9f0a5e28db4</sub>
+> <sub>Commit: 339b218e086c0e951ee83f55e83bc1f57a42bac2</sub>
 
 Legend: ✅ passed, ❌ failed/error, ⏭️ skipped, — not present.
 
 | Test Case | Solution | Template |
 | --- | --- | --- |
-| b2j.test.TestManager.strukturTests | ✅ | — |
-| b2j.test.TestManager.testMain | ✅ | — |
+| (no test results found) | — | — |
 <!-- TEST_OVERVIEW_END -->

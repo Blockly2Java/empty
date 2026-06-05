@@ -1,0 +1,34 @@
+// build.gradle — top-level coordinator.
+// Delegates test execution to Maven in the tests/ subdirectory.
+// No exercise-specific content; works in any fork unchanged.
+//
+// Usage:
+//   ./gradlew testSolution   → tests against solution/ (must be green)
+//   ./gradlew testTemplate   → tests against template/ (failures expected)
+//   ./gradlew clean test     → clean + testSolution
+
+task testSolution(type: Exec) {
+    group = 'verification'
+    description = 'Runs the test suite against the solution (Maven -Psolution)'
+    workingDir = file('tests')
+    commandLine './mvnw', '-B', 'clean', 'test', '-Psolution'
+}
+
+task testTemplate(type: Exec) {
+    group = 'verification'
+    description = 'Runs the test suite against the template (Maven -Ptemplate)'
+    workingDir = file('tests')
+    commandLine './mvnw', '-B', 'clean', 'test', '-Ptemplate', '-Dmaven.test.failure.ignore=true'
+}
+
+task test(dependsOn: testSolution) {
+    group = 'verification'
+    description = 'Alias for testSolution'
+}
+
+task clean(type: Exec) {
+    group = 'build'
+    description = 'Cleans Maven build output in tests/'
+    workingDir = file('tests')
+    commandLine './mvnw', '-B', 'clean'
+}

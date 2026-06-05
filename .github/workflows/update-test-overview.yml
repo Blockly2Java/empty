@@ -1,92 +1,92 @@
 name: Update Test Overview
-
 on:
   push:
-
 permissions:
   contents: write
-
 jobs:
   update-overview:
     name: Update README test overview
     runs-on: ubuntu-latest
-    env:
-      GH_PACKAGES_USERNAME: ${{ secrets.GH_PACKAGES_USERNAME }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-
     steps:
-      - name: Checkout repository
+      - name: Checkout coordinator
         uses: actions/checkout@v4
         with:
-          submodules: false
+          path: coordinator
 
-      - name: Rewrite submodule URLs to HTTPS
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Derive sub-repo names
+        id: repos
         run: |
-          git config --global --add url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf git@github.com:
-          git config --global --add url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf ssh://git@github.com/
+          EXERCISE="${GITHUB_REPOSITORY##*/}"
+          echo "exercise=${EXERCISE}" >> $GITHUB_OUTPUT
+          echo "tests=${GITHUB_REPOSITORY_OWNER}/${EXERCISE}_tests" >> $GITHUB_OUTPUT
+          echo "solution=${GITHUB_REPOSITORY_OWNER}/${EXERCISE}_solution" >> $GITHUB_OUTPUT
+          echo "template=${GITHUB_REPOSITORY_OWNER}/${EXERCISE}_template" >> $GITHUB_OUTPUT
 
-      - name: Initialize required submodules
-        run: |
-          git submodule sync -- solution template tests
-          git -c protocol.version=2 submodule update --init --force --depth=1 solution template tests
+      - name: Checkout tests
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.repos.outputs.tests }}
+          token: ${{ github.token }}
+          path: tests
 
-      - name: Fetch aux sources
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if [ ! -d aux/.git ]; then
-            git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/Blockly2Java/Smiley_aux.git" aux
-          fi
+      - name: Checkout solution
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.repos.outputs.solution }}
+          token: ${{ github.token }}
+          path: solution
 
-      - name: Stage aux classes for template build
-        run: |
-          mkdir -p template/src
-          find aux -maxdepth 1 -name '*.java' -exec cp -f {} template/src/ \;
+      - name: Checkout template
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.repos.outputs.template }}
+          token: ${{ github.token }}
+          path: template
 
-      - name: Set up JDK 17
+      - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '25'
           cache: maven
+          cache-dependency-path: tests/pom.xml
 
       - name: Run solution tests for overview
         continue-on-error: true
-        run: mvn -B -f tests/pom_solution.xml -Dbuildhelper.addsource.skip=true clean test
+        run: cd tests && ./mvnw -B clean test -Psolution
 
       - name: Save solution reports
         if: always()
         run: |
-          mkdir -p .ci-reports/solution
+          mkdir -p coordinator/.ci-reports/solution
           if [ -d tests/target/surefire-reports ]; then
-            cp -r tests/target/surefire-reports/. .ci-reports/solution/
+            cp -r tests/target/surefire-reports/. coordinator/.ci-reports/solution/
           fi
 
       - name: Run template tests for overview
         continue-on-error: true
-        run: mvn -B -f tests/pom_template.xml -Dmaven.test.failure.ignore=true clean test
+        run: cd tests && ./mvnw -B clean test -Ptemplate -Dmaven.test.failure.ignore=true
 
       - name: Save template reports
         if: always()
         run: |
-          mkdir -p .ci-reports/template
+          mkdir -p coordinator/.ci-reports/template
           if [ -d tests/target/surefire-reports ]; then
-            cp -r tests/target/surefire-reports/. .ci-reports/template/
+            cp -r tests/target/surefire-reports/. coordinator/.ci-reports/template/
           fi
 
       - name: Update README overview section
         if: always()
         run: |
-          python3 .github/scripts/update_readme_test_overview.py \
-            README.md \
-            .ci-reports/solution \
-            .ci-reports/template
+          python3 coordinator/.github/scripts/update_readme_test_overview.py \
+            coordinator/README.md \
+            coordinator/.ci-reports/solution \
+            coordinator/.ci-reports/template
 
       - name: Commit updated README
         if: always()
         run: |
+          cd coordinator
           if git diff --quiet -- README.md; then
             echo "README overview is unchanged."
             exit 0

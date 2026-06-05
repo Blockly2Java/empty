@@ -1,0 +1,18 @@
+# Simulates Artemis grading environment locally.
+# Requires sub-repos to be present (run local-setup.sh first).
+# Usage:
+#   docker compose run --rm artemis-solution
+#   docker compose run --rm artemis-template
+
+services:
+  artemis-solution:
+    image: ghcr.io/valentinherrmann/artemis-maven-docker:latest
+    volumes:
+      - ./tests:/               # _tests repo at container root (Artemis convention)
+      - ./solution:/assignment  # solution code at /assignment
+
+  artemis-template:
+    image: ghcr.io/valentinherrmann/artemis-maven-docker:latest
+    volumes:
+      - ./tests:/               # _tests repo at container root
+      - ./template:/assignment  # template code at /assignment
